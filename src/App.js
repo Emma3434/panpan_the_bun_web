@@ -7,14 +7,11 @@ import {
   Link
 } from "react-router-dom";
 
-import DiaryPage from "./components/DiaryPage.js"
+import HomePage from "./components/HomePage.js";
 import DiaryList from "./components/DiaryList.js";
-
-function DiaryList_1() {
-  return (
-      <h1> diary list </h1>
-  )
-}
+import DiaryPage from "./components/DiaryPage.js"
+import About from "./components/About.js";
+import EPanpan from "./components/EPanpan.js";
 
 function App() {
 
@@ -22,8 +19,11 @@ function App() {
     <div>
       <Router forceRefresh = {true}>
         <Switch>
-          <Route exact path="/" component={()=><DiaryList/>} />
+          <Route exact path="/" component={()=><HomePage/>} />
+          <Route exact path="/diaries" component={()=><DiaryList/>} />
           <Route path="/diaries/:id" component={({ match })=><DiaryPage match = {match}/>} />
+          <Route exact path="/about" component={()=><About/>} />
+          <Route exact path="/epanpan" component={()=><EPanpan/>} />
         </Switch>
       </Router>
     </div>

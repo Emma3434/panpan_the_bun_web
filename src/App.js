@@ -7,11 +7,11 @@ import {
   Link
 } from "react-router-dom";
 
-import HomePage from "./components/HomePage.js";
-import DiaryList from "./components/DiaryList.js";
-import DiaryPage from "./components/DiaryPage.js"
-import About from "./components/About.js";
-import EPanpan from "./components/EPanpan.js";
+import HomePage from "./pages/HomePage.js";
+import DiaryList from "./pages/DiaryList.js";
+import DiaryPage from "./pages/DiaryPage.js"
+import About from "./pages/About.js";
+import EPanpan from "./pages/EPanpan.js";
 
 function App() {
 

@@ -44,7 +44,7 @@ function DiaryPage({ match }) {
   return (
     <div>
       <button onClick={() => handleNavigation(currentIndex - 1)}>Previous</button>
-      <button onClick={() => window.location.href = "/"}>Calendar</button>
+      <button onClick={() => window.location.href = "/diaries"}>Calendar</button>
       <button onClick={() => handleNavigation(currentIndex + 1)}>Next</button>
       <h1>{diary.title}</h1>
       <p>{diary.date}</p>

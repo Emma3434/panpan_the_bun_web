@@ -2,7 +2,12 @@ import React from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
+// logo
 import logo from "../panpan-the-bun.svg";
+
+// icon
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faExclamation } from '@fortawesome/free-solid-svg-icons';
 
 function NavBar() {
   return (
@@ -17,7 +22,7 @@ function NavBar() {
             <Nav.Link as={Link} to="/diaries">Diaries</Nav.Link>
             <Nav.Link as={Link} to="/about">About</Nav.Link>
             <Nav.Link as={Link} to="/epanpan">
-                {/* <i className="fas fa-exclamation" style={{ marginRight: '0.5rem' }}></i> */}
+            <FontAwesomeIcon icon="exclamation" style={{ marginRight: '0.5rem' }} />
                 EPanpan
             </Nav.Link>
         </Nav>

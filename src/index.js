@@ -7,6 +7,13 @@ import reportWebVitals from './reportWebVitals';
 // bootstrap lumen theme
 import "bootswatch/dist/lumen/bootstrap.min.css";
 
+// icon
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faExclamation } from '@fortawesome/free-solid-svg-icons';
+
+library.add(faExclamation);
+
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

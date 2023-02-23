@@ -1,12 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+
 import Navbar from '../components/Navbar';
+import Card from '../components/Card';
 
 function HomePage() {
   return (
     <div>
       <Navbar />
-      <h1>Welcome to my website!</h1>
+      <Card />
     </div>
     // <div>
     //   <Navbar bg="light" expand="lg">

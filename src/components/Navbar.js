@@ -22,7 +22,7 @@ function NavBar() {
             <Nav.Link as={Link} to="/diaries">Diaries</Nav.Link>
             <Nav.Link as={Link} to="/about">About</Nav.Link>
             <Nav.Link as={Link} to="/epanpan">
-            <FontAwesomeIcon icon="exclamation" style={{ marginRight: '0.5rem' }} />
+            <FontAwesomeIcon icon={faExclamation} style={{ marginRight: '0.5rem' }} />
                 EPanpan
             </Nav.Link>
         </Nav>

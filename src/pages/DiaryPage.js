@@ -26,7 +26,8 @@ function DiaryPage({ match }) {
 
   const renderContent = (content) => {
     if (content.type === 'paragraph') {
-      return <p>{content.value}</p>;
+      // return <p>{content.value}</p>
+      return <p dangerouslySetInnerHTML={{ __html: content.value }}></p>;
     } else if (content.type === 'image') {
       return (
         <div>

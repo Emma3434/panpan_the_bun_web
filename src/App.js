@@ -12,7 +12,7 @@ import DiaryList from "./pages/DiaryList.js";
 import DiaryPage from "./pages/DiaryPage.js"
 import About from "./pages/About.js";
 import EPanpan from "./pages/EPanpan.js";
-import ImageUploader from "./pages/Edit.js";
+import Edit from "./pages/Edit.js";
 
 function App() {
 
@@ -25,7 +25,7 @@ function App() {
           <Route path="/diaries/:id" component={({ match })=><DiaryPage match = {match}/>} />
           <Route exact path="/about" component={()=><About/>} />
           <Route exact path="/epanpan" component={()=><EPanpan/>} />
-          <Route exact path="/edit" component={()=><ImageUploader/>} />
+          <Route exact path="/edit" component={()=><Edit/>} />
         </Switch>
       </Router>
     </div>

@@ -69,12 +69,14 @@ function DiaryList() {
         if ((week === 0 && i < firstDayOfMonth) || day > daysInMonth) {
           cells.push(<Col key={`${week}-${i}`}></Col>);
         } else {
-          const diary = diaries.find(
-            (d) =>
-              new Date(d.date).getDate() === day &&
-              new Date(d.date).getMonth() === month &&
-              new Date(d.date).getFullYear() === year
-          );
+          const diary = diaries.find((d) => {
+            const diaryDate = new Date(d.date);
+            return (
+              diaryDate.getUTCDate() === day &&
+              diaryDate.getUTCMonth() === month &&
+              diaryDate.getUTCFullYear() === year
+            );
+          });
           const button = diary ? (
             <Button variant="primary" href={`/diaries/${diary._id}`}>
               {day}

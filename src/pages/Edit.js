@@ -110,54 +110,129 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
+
+import { useHistory } from 'react-router-dom';
 
 // rich text editor
 import { Editor, EditorState, RichUtils } from 'draft-js';
 import 'draft-js/dist/Draft.css';
 
 // toolbar
-import { Container, ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
+import { Container, ButtonToolbar, ButtonGroup, Button, Dropdown } from 'react-bootstrap';
 import { ListGroup, Card } from 'react-bootstrap';
 
-function CreateBlog() {
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { fas } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSun, faCloud, faCloudSun, faCloudShowersHeavy, faSnowflake, faBolt, faSmog } from '@fortawesome/free-solid-svg-icons';
+library.add(fas);
+
+function CreateDiary() {
 
   // Add components
   const [title, setTitle] = useState('');
   const [content, setContent] = useState([]);
   const [date, setDate] = useState('');
+  const [selectedIcon, setSelectedIcon] = useState(faSun);
+
+  useEffect(() => {
+    const today = new Date();
+    const formattedDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+    setDate(formattedDate);
+  }, []);
+
+  const weatherIcons = [
+    faSun,
+    faCloud,
+    faCloudSun,
+    faCloudShowersHeavy,
+    faSnowflake,
+    faBolt,
+    faSmog,
+  ];  
+
 
   const handleTitleChange = (e) => {
     setTitle(e.target.value);
   };
 
-  const handleContentChange = (e, index) => {
+  const handleIconChange = (icon) => {
+    setSelectedIcon(icon);
+  };  
+
+  const handleContentChange = (e, index, captionSide) => {
     const newContent = [...content];
-    newContent[index] = e.target.value;
+    if (captionSide) {
+      newContent[index] = { ...newContent[index], [captionSide]: e.target.value };
+    } else {
+      newContent[index] = { ...newContent[index], value: e.target.value };
+    }
     setContent(newContent);
   };
+  
+  
 
   const handleAddParagraph = () => {
-    setContent([...content, 'paragraph']);
+    setContent([...content, { type: 'paragraph', value: '' }]);
   };
-
+  
   const handleAddSingleImage = () => {
-    setContent([...content, 'single-image']);
+    setContent([...content, { type: 'single-image', value: '', caption: '' }]);
   };
-
+  
   const handleAddDoubleImage = () => {
-    setContent([...content, 'double-image']);
-  };
+    setContent([...content, { type: 'double-image', leftCaption: '', rightCaption: '' }]);
+  }; 
 
-  const handleSubmit = (e) => {
+  
+
+
+  const history = useHistory();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log({
-      title,
-      content,
-      date
+  
+    // Map the content to the required format
+    const mappedContent = content.map((item) => {
+      if (typeof item === 'string') {
+        return { type: 'text', value: item };
+      } else {
+        return item;
+      }
     });
+  
+    // Create an object with the required format
+    const diary = {
+      title: title,
+      date: date,
+      weather: selectedIcon.iconName,
+      content: mappedContent,
+    };
+  
+    try {
+      // Post the diary to the server
+      const response = await fetch('http://localhost:3000/diaries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(diary), // stringify the diary object
+      });
+  
+      const result = await response.json();
+      console.log('Diary created:', result);
+  
+      // Redirect to the main page or any other page you want
+      history.push('/');
+    } catch (error) {
+      console.error('Error creating diary:', error);
+    }
   };
+  
+  
+  
 
   const handleDateChange = (e) => {
     setDate(e.target.value);
@@ -171,7 +246,7 @@ function CreateBlog() {
       <Container className="mt-3">
         <ButtonToolbar>
           <ButtonGroup className="mr-2">
-            <Button variant="primary" type="submit">Save</Button>
+            <Button variant="primary" onClick={handleSubmit}>Save</Button>
             <Button variant="warning">Cancel</Button>
           </ButtonGroup>
         </ButtonToolbar>
@@ -192,43 +267,76 @@ function CreateBlog() {
         <ListGroup.Item>
           <Card>
             <Card.Body>
-            <form onSubmit={handleSubmit}>
+            <form>
 
-              <input type="text" id="title" name="title" value={title} onChange={handleTitleChange} style={{width: '100%', marginBottom: '1rem', marginTop: '1rem'}} placeholder="Add a Title" />
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '1rem',
+                marginTop: '1rem',
+              }}
+            >
+              <input
+                type="text"
+                id="title"
+                name="title"
+                value={title}
+                onChange={handleTitleChange}
+                style={{ flex: 1, marginRight: '1rem' }}
+                placeholder="Add a Title"
+              />
 
+              <Dropdown style={{ marginLeft: '1rem' }}>
+                <Dropdown.Toggle variant="secondary" id="iconDropdown">
+                  <FontAwesomeIcon icon={selectedIcon} />
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {weatherIcons.map((icon, index) => (
+                    <Dropdown.Item key={index} onClick={() => handleIconChange(icon)}>
+                      <FontAwesomeIcon icon={icon} />
+                    </Dropdown.Item>
+                  ))}
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+
+
+              
               <input type="date" id="date" name="date" value={date} onChange={handleDateChange} style={{width: '100%', marginBottom: '1rem', marginTop: '1rem'}}/>
 
               {content.map((item, index) => {
-                if (item === 'paragraph') {
+                if (item.type === 'paragraph') {
                   return (
-                    <div key={index} style={{marginBottom: '1rem', marginTop: '1rem'}}>
-                      <p style= {{marginBottom: '0.5rem'}}><strong>Paragraph</strong></p> 
-                      <textarea value="" onChange={(e) => handleContentChange(e, index)} style={{width: '100%'}} placeholder="Enter paragraph text..." />
+                    <div key={index} style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                      <p style={{ marginBottom: '0.5rem' }}><strong>Paragraph</strong></p>
+                      <textarea value={item.value} onChange={(e) => handleContentChange(e, index)} style={{ width: '100%' }} placeholder="Enter paragraph text..." />
                     </div>
                   );
-                } else if (item === 'single-image') {
+                } else if (item.type === 'single-image') {
                   return (
-                    <div key={index} style={{marginBottom: '1rem', marginTop: '1rem'}}>
-                      <p style= {{marginBottom: '0.5rem'}}><strong>Single Image</strong></p> 
-                      <input type="file" id={`single-image-${index}`} name={`single-image-${index}`} style={{width: '100%'}}/>
+                    <div key={index} style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                      <p style={{ marginBottom: '0.5rem' }}><strong>Single Image</strong></p>
+                      <input type="file" id={`single-image-${index}`} name={`single-image-${index}`} style={{ width: '100%' }} />
                       <img style={{ width: '100%', marginBottom: '0.5rem' }} />
-                      <textarea value="" onChange={(e) => handleContentChange(e, index)} style={{width: '100%'}} placeholder="Enter image caption..." />
+                      <textarea value={item.caption} onChange={(e) => handleContentChange(e, index, 'caption')} style={{ width: '100%' }} placeholder="Enter image caption..." />
                     </div>
                   );
-                } else if (item === 'double-image') {
+                } else if (item.type === 'double-image') {
                   return (
-                    <div key={index} style={{marginBottom: '1rem', marginTop: '1rem'}}>
-                      <p style= {{marginBottom: '0.5rem'}}><strong>Double Images</strong></p> 
+                    <div key={index} style={{ marginBottom: '1rem', marginTop: '1rem' }}>
+                      <p style={{ marginBottom: '0.5rem' }}><strong>Double Images</strong></p>
                       <div className="row">
                         <div className="col">
                           <input className="diary-single-image-input" type="file" style={{ width: '100%', marginBottom: '0.5rem' }} />
                           <img style={{ width: '100%', marginBottom: '0.5rem' }} />
-                          <textarea className="diary-single-image-caption-input" placeholder="Caption" style={{ width: '100%' }}></textarea>
+                          <textarea className="diary-single-image-caption-input" value={item.leftCaption} onChange={(e) => handleContentChange(e, index, 'leftCaption')} placeholder="Caption" style={{ width: '100%' }} />
                         </div>
                         <div className="col">
                           <input className="diary-single-image-input" type="file" style={{ width: '100%', marginBottom: '0.5rem' }} />
                           <img style={{ width: '100%', marginBottom: '0.5rem' }} />
-                          <textarea className="diary-single-image-caption-input" placeholder="Caption" style={{ width: '100%' }}></textarea>
+                          <textarea className="diary-single-image-caption-input" value={item.rightCaption} onChange={(e) => handleContentChange(e, index, 'rightCaption')} placeholder="Caption" style={{ width: '100%' }} />
                         </div>
                       </div>
                     </div>
@@ -249,5 +357,5 @@ function CreateBlog() {
   );
 }
 
-export default CreateBlog;
+export default CreateDiary;
 

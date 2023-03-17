@@ -12,7 +12,20 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { fas } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCaretLeft, faCaretRight, faHome } from '@fortawesome/free-solid-svg-icons';
+
+
+import {
+  faSun,
+  faCloud,
+  faCloudSun,
+  faCloudShowersHeavy,
+  faSnowflake,
+  faBolt,
+} from "@fortawesome/free-solid-svg-icons";
+
+
 library.add(fas);
+
 
 function DiaryPage({ match }) {
   const [diary, setDiary] = useState(null);
@@ -37,6 +50,26 @@ function DiaryPage({ match }) {
     window.location.href = `/diaries/${nextDiary._id}`;
   };
 
+  const getWeatherIcon = (weather) => {
+    switch (weather) {
+      case "sun":
+        return faSun;
+      case "cloud":
+        return faCloud;
+      case "cloud-sun":
+        return faCloudSun;
+      case "cloud-showers-heavy":
+        return faCloudShowersHeavy;
+      case "snowflake":
+        return faSnowflake;
+      case "bolt":
+        return faBolt;
+      default:
+        return null;
+    }
+  };
+  
+
   const renderContent = (content) => {
     if (content.type === 'paragraph') {
       // return <p>{content.value}</p>
@@ -54,6 +87,8 @@ function DiaryPage({ match }) {
   if (!diary) {
     return <div>Loading...</div>;
   }
+
+  
 
   return (
     <div>
@@ -86,7 +121,7 @@ function DiaryPage({ match }) {
             <Card.Body>
             <h1>{diary.title}</h1>
             <p>{diary.date}</p>
-            <p>{diary.weather}</p>
+            <FontAwesomeIcon icon={getWeatherIcon(diary.weather)} />
             {diary.content.map((content, index) => (
               <div key={index}>
                 {renderContent(content)}

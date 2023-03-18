@@ -1,6 +1,18 @@
 import React, { useState, useEffect } from "react";
 import NavBar from "../components/Navbar";
 
+import { Container, ButtonToolbar, ButtonGroup, Button } from 'react-bootstrap';
+import { ListGroup, Card } from 'react-bootstrap';
+
+import { Row, Col} from 'react-bootstrap';
+
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { far } from "@fortawesome/free-regular-svg-icons";
+import { library } from "@fortawesome/fontawesome-svg-core";
+
+library.add(fas, far);
+
 function About() {
   const [aboutData, setAboutData] = useState([]);
 
@@ -15,18 +27,42 @@ function About() {
     return <p>Loading...</p>;
   }
 
+  const renderIcon = (iconName) => {
+    if (!iconName) {
+      return null;
+    }
+    
+    const [prefix, iconNameWithoutPrefix] = iconName.split(" ");
+    return <FontAwesomeIcon icon={[prefix, iconNameWithoutPrefix]} />;
+  };
+  
+
   return (
     <div>
       <NavBar/>
       <h2>About</h2>
-      {aboutData.map((aboutItem, index) => (
-        <div key={index}>
-          {/* <img src={aboutItem.icon} alt={aboutItem.content} /> */}
-          <p>{aboutItem.icon}</p>
-          <p>{aboutItem.content}</p>
-          <p>{aboutItem.item}</p>
-        </div>
-      ))}
+      <ListGroup>
+        <ListGroup.Item>
+          <Card>
+            <Card.Body>
+              {aboutData.map((aboutItem, index) => (
+                <div key={index}>
+                  <ListGroup>
+                  <ListGroup.Item>
+                    <h6 class="text-success">
+                      {renderIcon(aboutItem.icon)}
+                      {aboutItem.item}
+                    </h6>
+                    <p>{aboutItem.content}</p>
+                  </ListGroup.Item>
+                </ListGroup>
+                </div>
+              ))}
+            </Card.Body>
+          </Card>
+        </ListGroup.Item>
+      </ListGroup>
+      
     </div>
   );
 }

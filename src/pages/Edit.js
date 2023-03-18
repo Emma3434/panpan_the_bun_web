@@ -1,115 +1,3 @@
-// import React, { useState, useEffect } from 'react';
-// import Navbar from '../components/Navbar';
-
-// function Edit() {
-//   const [selectedFile, setSelectedFile] = useState(null);
-//   const [images, setImages] = useState([]);
-
-//   useEffect(() => {
-//     async function fetchData() {
-//       try {
-//         const response = await fetch('http://localhost:3000/image');
-//         const data = await response.json();
-//         setImages(data);
-//       } catch (err) {
-//         console.error(err);
-//       }
-//     }
-//     fetchData();
-//   }, []);
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-  
-//     const formData = new FormData();
-//     formData.append('img_id', selectedFile.name.split('.')[0]);
-//     formData.append('img', selectedFile[0]);
-    
-  
-//     // Check for duplicated img_id
-//     const existingImage = images.find((image) => image.img_id === formData.get('img_id'));
-//     if (existingImage) {
-//       console.log(`Replacing image with img_id: ${formData.get('img_id')}`);
-//       try {
-//         await fetch(`http://localhost:3000/image/${existingImage._id}`, {
-//           method: 'PUT',
-//           body: formData,
-//         });
-//         setImages((prevImages) =>
-//           prevImages.map((image) => {
-//             if (image._id === existingImage._id) {
-//               return { ...existingImage };
-//             }
-//             return image;
-//           })
-//         );
-//       } catch (err) {
-//         console.error(err);
-//       }
-//     } else {
-//       // Upload new image if img_id doesn't exist
-//       try {
-//         const response = await fetch('http://localhost:3000/image', {
-//           method: 'POST',
-//           body: formData,
-//         });
-//         const data = await response.json();
-//         console.log(data);
-//         setImages((prevImages) => [...prevImages, data]);
-//       } catch (err) {
-//         console.error(err);
-//       }
-//     }
-//   };
-  
-
-//   const handleFileChange = (e) => {
-//     setSelectedFile(e.target.files[0]);
-//   };
-
-//   return (
-//     <div>
-//       <Navbar />
-//       <form onSubmit={handleSubmit}>
-//         <input type="file" onChange={handleFileChange} multiple/>
-//         <button type="submit">Upload Image</button>
-//       </form>
-
-
-//     </div>
-//   );
-// }
-
-// export default Edit;
-
-
-// {images.map((image) => {
-//   const base64String = btoa(
-//     new Uint8Array(image.img.data).reduce(
-//       (data, byte) => data + String.fromCharCode(byte),
-//       ''
-//     )
-//   );
-//   const imageUrl = `data:${image.img.contentType};base64,${base64String}`;
-
-//   return (
-//     <div key={image._id}>
-//       <img src={imageUrl} alt="Image" />
-//     </div>
-//   );
-// })}
-
-
-
-
-
-
-
-
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 
@@ -201,68 +89,95 @@ function CreateDiary() {
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    // Map the content to the required format
-    const mappedContent = await Promise.all(
-      content.map(async (item, index) => {
-        if (typeof item === 'string') {
-          return { type: 'text', value: item };
-        } else if (item.type === 'double-image') {
-          const leftImgInput = document.getElementById(`double-image-left-${index}`);
-          const leftImgFile = leftImgInput.files[0];
-          const leftImgFileName = leftImgFile.name;
-          const leftImgFileWithoutExtension = removeFileExtension(leftImgFileName);
-    
-          const rightImgInput = document.getElementById(`double-image-right-${index}`);
-          const rightImgFile = rightImgInput.files[0];
-          const rightImgFileName = rightImgFile.name;
-          const rightImgFileWithoutExtension = removeFileExtension(rightImgFileName);
-    
-          // Save the left image to your image database
-          const leftFormData = new FormData();
-          leftFormData.append('img_id', leftImgFileWithoutExtension);
-          leftFormData.append('img', leftImgFile);
-    
-          const leftImgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
-            method: 'POST',
-            body: leftFormData,
-          });
-    
-          if (!leftImgUploadResponse.ok) {
-            throw new Error('Error uploading left image');
-          }
-    
-          // Save the right image to your image database
-          const rightFormData = new FormData();
-          rightFormData.append('img_id', rightImgFileWithoutExtension);
-          rightFormData.append('img', rightImgFile);
-    
-          const rightImgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
-            method: 'POST',
-            body: rightFormData,
-          });
-    
-          if (!rightImgUploadResponse.ok) {
-            throw new Error('Error uploading right image');
-          }
-    
-          return {
-            type: 'double-image',
-            value: [
-              {
-                value: leftImgFileWithoutExtension,
-                caption: item.leftCaption,
-              },
-              {
-                value: rightImgFileWithoutExtension,
-                caption: item.rightCaption,
-              },
-            ],
-          };
-        } else {
-          return item;
+  // Map the content to the required format
+  const mappedContent = await Promise.all(
+    content.map(async (item, index) => {
+      if (typeof item === 'string') {
+        return { type: 'text', value: item };
+      } else if (item.type === 'single-image') {
+        const imgInput = document.getElementById(`single-image-${index}`);
+        const imgFile = imgInput.files[0];
+        const imgFileName = imgFile.name;
+        const imgFileWithoutExtension = removeFileExtension(imgFileName);
+
+        // Save the image to your image database
+        const formData = new FormData();
+        formData.append('img_id', imgFileWithoutExtension);
+        formData.append('img', imgFile);
+
+        const imgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!imgUploadResponse.ok) {
+          throw new Error('Error uploading image');
         }
-      })
-    );
+
+        return {
+          type: 'single-image',
+          value: imgFileWithoutExtension,
+          caption: item.caption,
+        };
+      } else if (item.type === 'double-image') {
+        const leftImgInput = document.getElementById(`double-image-left-${index}`);
+        const leftImgFile = leftImgInput.files[0];
+        const leftImgFileName = leftImgFile.name;
+        const leftImgFileWithoutExtension = removeFileExtension(leftImgFileName);
+
+        const rightImgInput = document.getElementById(`double-image-right-${index}`);
+        const rightImgFile = rightImgInput.files[0];
+        const rightImgFileName = rightImgFile.name;
+        const rightImgFileWithoutExtension = removeFileExtension(rightImgFileName);
+
+        // Save the left image to your image database
+        const leftFormData = new FormData();
+        leftFormData.append('img_id', leftImgFileWithoutExtension);
+        leftFormData.append('img', leftImgFile);
+
+        const leftImgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
+          method: 'POST',
+          body: leftFormData,
+        });
+
+        if (!leftImgUploadResponse.ok) {
+          throw new Error('Error uploading left image');
+        }
+
+        // Save the right image to your image database
+        const rightFormData = new FormData();
+        rightFormData.append('img_id', rightImgFileWithoutExtension);
+        rightFormData.append('img', rightImgFile);
+
+        const rightImgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
+          method: 'POST',
+          body: rightFormData,
+        });
+
+        if (!rightImgUploadResponse.ok) {
+          throw new Error('Error uploading right image');
+        }
+
+        return {
+          type: 'double-image',
+          value: [
+            {
+              value: leftImgFileWithoutExtension,
+              caption: item.leftCaption,
+            },
+            {
+              value: rightImgFileWithoutExtension,
+              caption: item.rightCaption,
+            },
+          ],
+        };
+      } else {
+        return item;
+      }
+    })
+  );
+
+
   
     // Create an object with the required format
     const diary = {
@@ -398,7 +313,7 @@ function CreateDiary() {
                             style={{ width: '100%', marginBottom: '0.5rem' }}
                           />
                           <img style={{ width: '100%', marginBottom: '0.5rem' }} />
-                          <textarea className="diary-single-image-caption-input" value={item.leftCaption} onChange={(e) => handleContentChange(e, index, 'leftCaption')} placeholder="Caption" style={{ width: '100%' }} />
+                          <textarea className="diary-single-image-caption-input" value={item.leftCaption} onChange={(e) => handleContentChange(e, index, 'leftCaption')} placeholder="Enter image caption..." style={{ width: '100%' }} />
                           </div>
                             <div className="col">
                               <input
@@ -408,7 +323,7 @@ function CreateDiary() {
                                 style={{ width: '100%', marginBottom: '0.5rem' }}
                               />
                           <img style={{ width: '100%', marginBottom: '0.5rem' }} />
-                          <textarea className="diary-single-image-caption-input" value={item.rightCaption} onChange={(e) => handleContentChange(e, index, 'rightCaption')} placeholder="Caption" style={{ width: '100%' }} />
+                          <textarea className="diary-single-image-caption-input" value={item.rightCaption} onChange={(e) => handleContentChange(e, index, 'rightCaption')} placeholder="Enter image caption..." style={{ width: '100%' }} />
                         </div>
                       </div>
                     </div>

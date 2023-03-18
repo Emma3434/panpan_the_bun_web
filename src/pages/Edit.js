@@ -184,7 +184,9 @@ function CreateDiary() {
   
   const handleAddDoubleImage = () => {
     setContent([...content, { type: 'double-image', leftCaption: '', rightCaption: '' }]);
-  }; 
+  };
+  
+
 
   
 
@@ -204,29 +206,57 @@ function CreateDiary() {
       content.map(async (item, index) => {
         if (typeof item === 'string') {
           return { type: 'text', value: item };
-        } else if (item.type === 'single-image' || item.type === 'double-image') {
-          const imgInput = document.getElementById(`single-image-${index}`);
-          const imgFile = imgInput.files[0];
-          const imgFileName = imgFile.name;
-          const imgFileWithoutExtension = removeFileExtension(imgFileName);
-  
-          // Save the image to your image database
-          const formData = new FormData();
-          formData.append('img_id', imgFileWithoutExtension);
-          formData.append('img', imgFile);
-  
-          const imgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
+        } else if (item.type === 'double-image') {
+          const leftImgInput = document.getElementById(`double-image-left-${index}`);
+          const leftImgFile = leftImgInput.files[0];
+          const leftImgFileName = leftImgFile.name;
+          const leftImgFileWithoutExtension = removeFileExtension(leftImgFileName);
+    
+          const rightImgInput = document.getElementById(`double-image-right-${index}`);
+          const rightImgFile = rightImgInput.files[0];
+          const rightImgFileName = rightImgFile.name;
+          const rightImgFileWithoutExtension = removeFileExtension(rightImgFileName);
+    
+          // Save the left image to your image database
+          const leftFormData = new FormData();
+          leftFormData.append('img_id', leftImgFileWithoutExtension);
+          leftFormData.append('img', leftImgFile);
+    
+          const leftImgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
             method: 'POST',
-            body: formData,
+            body: leftFormData,
           });
-  
-          if (!imgUploadResponse.ok) {
-            throw new Error('Error uploading image');
+    
+          if (!leftImgUploadResponse.ok) {
+            throw new Error('Error uploading left image');
           }
-  
+    
+          // Save the right image to your image database
+          const rightFormData = new FormData();
+          rightFormData.append('img_id', rightImgFileWithoutExtension);
+          rightFormData.append('img', rightImgFile);
+    
+          const rightImgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
+            method: 'POST',
+            body: rightFormData,
+          });
+    
+          if (!rightImgUploadResponse.ok) {
+            throw new Error('Error uploading right image');
+          }
+    
           return {
-            ...item,
-            value: imgFileWithoutExtension,
+            type: 'double-image',
+            value: [
+              {
+                value: leftImgFileWithoutExtension,
+                caption: item.leftCaption,
+              },
+              {
+                value: rightImgFileWithoutExtension,
+                caption: item.rightCaption,
+              },
+            ],
           };
         } else {
           return item;
@@ -255,7 +285,7 @@ function CreateDiary() {
       const result = await response.json();
       console.log('Diary created:', result);
   
-      // Redirect to the main page or any other page you want
+      // Redirect to the main page or any other page  
       history.push('/edit');
     } catch (error) {
       console.error('Error creating diary:', error);
@@ -361,12 +391,22 @@ function CreateDiary() {
                       <p style={{ marginBottom: '0.5rem' }}><strong>Double Images</strong></p>
                       <div className="row">
                         <div className="col">
-                          <input className="diary-single-image-input" type="file" style={{ width: '100%', marginBottom: '0.5rem' }} />
+                          <input
+                            className="diary-single-image-input"
+                            type="file"
+                            id={`double-image-left-${index}`}
+                            style={{ width: '100%', marginBottom: '0.5rem' }}
+                          />
                           <img style={{ width: '100%', marginBottom: '0.5rem' }} />
                           <textarea className="diary-single-image-caption-input" value={item.leftCaption} onChange={(e) => handleContentChange(e, index, 'leftCaption')} placeholder="Caption" style={{ width: '100%' }} />
-                        </div>
-                        <div className="col">
-                          <input className="diary-single-image-input" type="file" style={{ width: '100%', marginBottom: '0.5rem' }} />
+                          </div>
+                            <div className="col">
+                              <input
+                                className="diary-single-image-input"
+                                type="file"
+                                id={`double-image-right-${index}`}
+                                style={{ width: '100%', marginBottom: '0.5rem' }}
+                              />
                           <img style={{ width: '100%', marginBottom: '0.5rem' }} />
                           <textarea className="diary-single-image-caption-input" value={item.rightCaption} onChange={(e) => handleContentChange(e, index, 'rightCaption')} placeholder="Caption" style={{ width: '100%' }} />
                         </div>

@@ -68,21 +68,35 @@ function DiaryPage({ match }) {
         return null;
     }
   };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const options = { month: 'long', day: 'numeric', year: 'numeric', weekday: 'short' };
+    return new Intl.DateTimeFormat('en-US', options).format(date);
+  };  
   
 
   const renderContent = (content) => {
     if (content.type === 'paragraph') {
-      // return <p>{content.value}</p>
       return <p dangerouslySetInnerHTML={{ __html: content.value }}></p>;
     } else if (content.type === 'image') {
+      const base64String = btoa(
+        new Uint8Array(content.img.data).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ''
+        )
+      );
+      const imageUrl = `data:${content.img.contentType};base64,${base64String}`;
+  
       return (
         <div>
-          <img src={content.value} alt={content.caption} />
+          <img src={imageUrl} alt={content.caption} style={{ width: '100%' }}/>
           <p>{content.caption}</p>
         </div>
       );
     }
   };
+  
 
   if (!diary) {
     return <div>Loading...</div>;
@@ -120,8 +134,11 @@ function DiaryPage({ match }) {
           <Card>
             <Card.Body>
             <h1>{diary.title}</h1>
-            <p>{diary.date}</p>
-            <FontAwesomeIcon icon={getWeatherIcon(diary.weather)} />
+            <h6 className="text-muted card-subtitle mb-2">
+              {formatDate(diary.date)}{' '}
+              <FontAwesomeIcon icon={getWeatherIcon(diary.weather)} />
+              <br />
+            </h6>
             {diary.content.map((content, index) => (
               <div key={index}>
                 {renderContent(content)}

@@ -191,17 +191,48 @@ function CreateDiary() {
 
   const history = useHistory();
 
+  const removeFileExtension = (fileName) => {
+    return fileName.split('.').slice(0, -1).join('.');
+  };
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
   
     // Map the content to the required format
-    const mappedContent = content.map((item) => {
-      if (typeof item === 'string') {
-        return { type: 'text', value: item };
-      } else {
-        return item;
-      }
-    });
+    const mappedContent = await Promise.all(
+      content.map(async (item, index) => {
+        if (typeof item === 'string') {
+          return { type: 'text', value: item };
+        } else if (item.type === 'single-image' || item.type === 'double-image') {
+          const imgInput = document.getElementById(`single-image-${index}`);
+          const imgFile = imgInput.files[0];
+          const imgFileName = imgFile.name;
+          const imgFileWithoutExtension = removeFileExtension(imgFileName);
+  
+          // Save the image to your image database
+          const formData = new FormData();
+          formData.append('img_id', imgFileWithoutExtension);
+          formData.append('img', imgFile);
+  
+          const imgUploadResponse = await fetch('https://panpan-server.herokuapp.com/image', {
+            method: 'POST',
+            body: formData,
+          });
+  
+          if (!imgUploadResponse.ok) {
+            throw new Error('Error uploading image');
+          }
+  
+          return {
+            ...item,
+            value: imgFileWithoutExtension,
+          };
+        } else {
+          return item;
+        }
+      })
+    );
   
     // Create an object with the required format
     const diary = {
@@ -213,7 +244,7 @@ function CreateDiary() {
   
     try {
       // Post the diary to the server
-      const response = await fetch('http://localhost:3000/diaries', {
+      const response = await fetch('https://panpan-server.herokuapp.com/diaries', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -225,11 +256,12 @@ function CreateDiary() {
       console.log('Diary created:', result);
   
       // Redirect to the main page or any other page you want
-      history.push('/');
+      history.push('/edit');
     } catch (error) {
       console.error('Error creating diary:', error);
     }
   };
+  
   
   
   

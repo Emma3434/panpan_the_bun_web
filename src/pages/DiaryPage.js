@@ -71,9 +71,16 @@ function DiaryPage({ match }) {
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const options = { month: 'long', day: 'numeric', year: 'numeric', weekday: 'short' };
+    const options = { 
+      month: 'long', 
+      day: 'numeric', 
+      year: 'numeric', 
+      weekday: 'short',
+      timeZone: 'UTC' // set the time zone to UTC
+    };
     return new Intl.DateTimeFormat('en-US', options).format(date);
-  };  
+  };
+  
   
 
   const renderContent = (content) => {

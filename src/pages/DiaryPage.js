@@ -79,7 +79,7 @@ function DiaryPage({ match }) {
   const renderContent = (content) => {
     if (content.type === 'paragraph') {
       return <p dangerouslySetInnerHTML={{ __html: content.value }}></p>;
-    } else if (content.type === 'image') {
+    } else if (content.type === 'single-image') {
       const base64String = btoa(
         new Uint8Array(content.img.data).reduce(
           (data, byte) => data + String.fromCharCode(byte),
@@ -94,8 +94,30 @@ function DiaryPage({ match }) {
           <p>{content.caption}</p>
         </div>
       );
+    } else if (content.type === 'double-image') {
+      return (
+        <Row>
+          {content.value.map((imageContent, index) => {
+            const base64String = btoa(
+              new Uint8Array(imageContent.img.data).reduce(
+                (data, byte) => data + String.fromCharCode(byte),
+                ''
+              )
+            );
+            const imageUrl = `data:${imageContent.img.contentType};base64,${base64String}`;
+  
+            return (
+              <Col key={index} xs={6}>
+                <img src={imageUrl} alt={imageContent.caption} style={{ width: '100%' }}/>
+                <p>{imageContent.caption}</p>
+              </Col>
+            );
+          })}
+        </Row>
+      );
     }
   };
+  
   
 
   if (!diary) {

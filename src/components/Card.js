@@ -24,11 +24,6 @@ const Card = () => {
               <div className="text-center p-4 p-lg-5">
                 <a className="btn btn-primary fs-5 me-2 py-2 px-4" role="button" data-bs-toggle="tooltip" data-bss-tooltip="" data-bss-hover-animate="bounce" title="Follow me pweeez" href="https://www.instagram.com/panpan_the_bun_/">My Instagram&nbsp;<FontAwesomeIcon icon={['fab', 'instagram']} /></a>
               </div>
-              <div className="row">
-                <div className="col" style={{textAlign: "center", flex: "1 1 auto"}}>
-                  {/* <img className="img-fluid" data-bs-toggle="tooltip" data-bss-tooltip="" src={img} alt="I am going home~" title="I am going hooome~" /> */}
-                </div>
-              </div>
             </div>
           </div>
         </li>

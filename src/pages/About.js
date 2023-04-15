@@ -33,7 +33,7 @@ function About() {
     }
     
     const [prefix, iconNameWithoutPrefix] = iconName.split(" ");
-    return <FontAwesomeIcon icon={[prefix, iconNameWithoutPrefix]} />;
+    return <FontAwesomeIcon icon={[prefix, iconNameWithoutPrefix]} style={{ marginRight: "0.5rem" }}/>;
   };
   
 
@@ -49,10 +49,10 @@ function About() {
                 <div key={index}>
                   <ListGroup>
                   <ListGroup.Item>
-                    <h6 class="text-success">
+                    <h5 class="text-success" >
                       {renderIcon(aboutItem.icon)}
                       {aboutItem.item}
-                    </h6>
+                    </h5>
                     <p>{aboutItem.content}</p>
                   </ListGroup.Item>
                 </ListGroup>

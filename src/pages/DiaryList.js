@@ -110,13 +110,13 @@ function DiaryList() {
   return (
     <div>
       <NavBar />
-      <h2 className="text-center" style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+      <h2 className="text-center" style={{ marginTop: "1rem", marginBottom: "1rem"}}>
         <span style={{ marginRight: "1rem" }}>
           <FontAwesomeIcon icon={faCalendarAlt} />
         </span>
         Diary
       </h2>
-      <Container fluid className="left-home-right mt-3" style={{ marginTop: "1rem", marginBottom: "1rem" }}>
+      <Container fluid className="left-home-right mt-3" style={{ marginTop: "1rem", marginBottom: "1rem" , maxWidth: "800px"}}>
         <Row className="m-0 justify-content-center">
           <Col xs={1} className="d-flex justify-content-start align-items-center p-0">
             <Button variant="primary" role="button" onClick={handlePreviousYear}>
@@ -144,8 +144,8 @@ function DiaryList() {
         </Row>
       </Container>
 
-      <Container>
-        <Row className="justify-content-center">
+      <Container style={{ maxWidth: "800px"}}> 
+        <Row className="justify-content-center" >
           <Col md={8}>
             <table className="w-100">
               <tbody>{renderCalendar()}</tbody>

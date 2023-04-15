@@ -72,14 +72,26 @@ function DiaryPage({ match }) {
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const options = { 
-      month: 'long', 
-      day: 'numeric', 
-      year: 'numeric', 
-      weekday: 'short',
+      year: 'numeric',
+      month: 'long',
+      day: '2-digit', 
+      weekday: 'long',
       timeZone: 'UTC' // set the time zone to UTC
     };
-    return new Intl.DateTimeFormat('en-US', options).format(date);
-  };
+    
+    const ordinal = (n) => {
+      const s = ['th', 'st', 'nd', 'rd'];
+      const v = n % 100;
+      return n + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+    
+    const formattedDate = new Intl.DateTimeFormat('en-US', options).format(date);
+    const dateParts = formattedDate.split(", ");
+    const [weekday, monthAndDay, year] = dateParts;
+    const [month, day] = monthAndDay.split(" ");
+  
+    return `${month} ${ordinal(parseInt(day))}, ${year} ${weekday}`;
+  };  
   
   
 
@@ -96,15 +108,17 @@ function DiaryPage({ match }) {
       const imageUrl = `data:${content.img.contentType};base64,${base64String}`;
   
       return (
-        <div>
-          <img src={imageUrl} alt={content.caption} style={{ width: '100%' }}/>
-          <p>{content.caption}</p>
+        <div style={{ textAlign: 'center' }}>
+          <img src={imageUrl} alt={content.caption} style={{ width: '100%', maxWidth: '400px'}}/>
+          <p className="text-center" dangerouslySetInnerHTML={{ __html: content.caption }}></p>
         </div>
       );
     } else if (content.type === 'double-image') {
       return (
+        
         <Row>
           {content.value.map((imageContent, index) => {
+            
             const base64String = btoa(
               new Uint8Array(imageContent.img.data).reduce(
                 (data, byte) => data + String.fromCharCode(byte),
@@ -112,15 +126,40 @@ function DiaryPage({ match }) {
               )
             );
             const imageUrl = `data:${imageContent.img.contentType};base64,${base64String}`;
-  
+
+            const minHeight = Math.min(...content.value.map((img) => img.img.height));
             return (
-              <Col key={index} xs={6}>
-                <img src={imageUrl} alt={imageContent.caption} style={{ width: '100%' }}/>
-                <p>{imageContent.caption}</p>
+              <Col key={index} xs={6} style={{ textAlign: 'center'}}>
+                <img src={imageUrl} alt={imageContent.caption} style={{ width: '100%', maxHeight: `${minHeight}px` }}/>
+                <p className="text-center" dangerouslySetInnerHTML={{ __html: imageContent.caption }}></p>
               </Col>
             );
           })}
         </Row>
+        // <Row>
+        //   {content.value.map((imageContent, index) => {
+
+        //     const base64String = btoa(
+        //       new Uint8Array(imageContent.img.data).reduce(
+        //         (data, byte) => data + String.fromCharCode(byte),
+        //         ''
+        //       )
+        //     );
+        //     const imageUrl = `data:${imageContent.img.contentType};base64,${base64String}`;
+
+        //     const minHeight = Math.min(...content.value.map((img) => img.img.height));
+        //     return (
+        //       <Col key={index} xs={6} style={{ textAlign: 'center'}}>
+        //         <div style={{ height: `${minHeight}px`, width: '100%', overflow: 'hidden', position: 'relative' }}>
+        //           <img src={imageUrl} alt={imageContent.caption} style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', objectFit: 'cover', height: '100%', width: '100%' }}/>
+        //         </div>
+        //         <p className="text-center" dangerouslySetInnerHTML={{ __html: imageContent.caption }}></p>
+        //       </Col>
+        //     );
+        //   })}
+        // </Row>
+
+
       );
     }
   };
@@ -128,7 +167,10 @@ function DiaryPage({ match }) {
   
 
   if (!diary) {
-    return <div>Loading...</div>;
+    return <div>
+      <h1>Loading Panpan's diary...</h1>
+      <p>Thank you for waiting woof~</p>
+    </div>;
   }
 
   
@@ -136,11 +178,11 @@ function DiaryPage({ match }) {
   return (
     <div>
       <NavBar/>
-      <Container fluid className="left-home-right mt-3">
+      <Container fluid style={{ position: 'sticky', top: '80px', zIndex: 100, backgroundColor: '#000000', maxWidth: "800px" }}>
         <Row className="m-0 justify-content-end">
           <Col xs={4} className="p-0">
             <Button variant="primary" onClick={() => handleNavigation(currentIndex - 1)} aria-label="Previous">
-              <FontAwesomeIcon icon={faCaretLeft} className="mr-1" /> LAST
+                <FontAwesomeIcon icon={faCaretLeft} className="mr-1" /> LAST
             </Button>
           </Col>
           <Col xs={4} className="p-0 text-center">
@@ -156,11 +198,9 @@ function DiaryPage({ match }) {
         </Row>
       </Container>
 
-
-
       <ListGroup>
-        <ListGroup.Item>
-          <Card>
+        <ListGroup.Item className="border-0">
+          <Card className="mx-auto" style={{ maxWidth: "800px" }}>
             <Card.Body>
             <h1>{diary.title}</h1>
             <h6 className="text-muted card-subtitle mb-2">

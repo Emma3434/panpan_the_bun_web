@@ -1,5 +1,23 @@
 # Panpan the bun web front end
 
+color pallette:
+
+orange leaf: #D46613
+
+deep brown: #A05B27
+
+light brown: #B07548
+
+burnt yellow: #D4800F
+
+pink: #F3754C
+
+yellow: #F3B340
+
+creame white: #F3F0ED
+
+light salmon: #FFD1B0
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

@@ -3,13 +3,15 @@ import { Navbar, Nav } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 // logo
-import logo from "../panpan-the-bun.svg";
+// import logo from "../../public/panpan-the-bun.svg";
+// const logo = `${process.env.PUBLIC_URL}/panpan-the-bun.svg`;
 
 // icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faExclamation } from '@fortawesome/free-solid-svg-icons';
 
 function NavBar() {
+  const logo = `${process.env.PUBLIC_URL}/panpan-the-bun.svg`;
   return (
     <Navbar bg="secondary" variant="light" expand="md" sticky="top" style = {{padding: "0.5rem 2rem"}}>
       <Navbar.Brand as={Link} to="/">
